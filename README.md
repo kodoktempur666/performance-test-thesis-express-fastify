@@ -1,6 +1,10 @@
 <div align="center">
 
-# ANALISIS KOMPARATIF DAN OPTIMASI KINERJA FRAMEWORK EXPRESS.JS DAN FASTIFY DALAM MENANGANI KONDISI HIGH CONCURRENT REQUEST MENGGUNAKAN METODE LOAD TESTING
+## ANALISIS KOMPARATIF DAN OPTIMASI KINERJA FRAMEWORK EXPRESS.JS DAN FASTIFY DALAM MENANGANI KONDISI HIGH CONCURRENT REQUEST MENGGUNAKAN METODE LOAD TESTING
+
+Telkom University — S1 Rekayasa Perangkat Lunak, 2026
+
+[🔗 Lihat Karya Ilmiah di Telkom University Open Library](https://openlibrary.telkomuniversity.ac.id/home/catalog/id/248710/slug/analisis-komparatif-dan-optimasi-kinerja-framework-express-js-dan-fastify-dalam-menangani-kondisi-high-concurrent-request-menggunakan-metode-load-testing-dalam-bentuk-buku-karya-ilmiah.html)
 
 ### ⚡ Benchmark Express.js vs Fastify untuk REST API E-Commerce
 
