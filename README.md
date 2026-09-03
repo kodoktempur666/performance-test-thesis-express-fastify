@@ -82,7 +82,7 @@ Monitoring dilakukan dengan Prometheus dan Grafana, sedangkan load testing dilak
 
 ```text
 .
-├── fastify-express-skripsi/
+├── fastify-express-baseline/
 │   ├── express/              # Express baseline
 │   ├── fastify/              # Fastify baseline
 │   └── docker-compose.yaml   # Container baseline
