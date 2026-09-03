@@ -1,14 +1,15 @@
 <div align="center">
 
-# ⚡ Performance Test Thesis
+# ANALISIS KOMPARATIF DAN OPTIMASI KINERJA FRAMEWORK EXPRESS.JS DAN FASTIFY DALAM MENANGANI KONDISI HIGH CONCURRENT REQUEST MENGGUNAKAN METODE LOAD TESTING
 
-### Benchmark Express.js vs Fastify untuk REST API E-Commerce
+### ⚡ Benchmark Express.js vs Fastify untuk REST API E-Commerce
 
-![Node.js](https://img.shields.io/badge/Node.js-24.x-5FA04E?style=for-the-badge&logo=node.js&logoColor=white)
-![Express](https://img.shields.io/badge/Express.js-5.x-000000?style=for-the-badge&logo=express&logoColor=white)
-![Fastify](https://img.shields.io/badge/Fastify-5.x-202020?style=for-the-badge&logo=fastify&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-5432-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-24-5FA04E?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-5.2.1-000000?style=for-the-badge&logo=express&logoColor=white)
+![Fastify](https://img.shields.io/badge/Fastify-5.7.2-202020?style=for-the-badge&logo=fastify&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-DBMS-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-Queue-DC382D?style=for-the-badge&logo=redis&logoColor=white)
+![BullMQ](https://img.shields.io/badge/BullMQ-Job_Queue-202020?style=for-the-badge)
 ![k6](https://img.shields.io/badge/k6-Load_Testing-7D64FF?style=for-the-badge&logo=k6&logoColor=white)
 ![Grafana](https://img.shields.io/badge/Grafana-Dashboard-F46800?style=for-the-badge&logo=grafana&logoColor=white)
 ![Prometheus](https://img.shields.io/badge/Prometheus-Metrics-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)
@@ -19,7 +20,7 @@
 
 ## 📌 Ringkasan Project
 
-Repository ini dibuat untuk kebutuhan penelitian/skripsi mengenai perbandingan performa backend REST API berbasis Express.js dan Fastify. Sistem yang diuji mensimulasikan alur e-commerce sederhana, seperti autentikasi user, browsing produk, aktivitas keranjang, checkout, dan monitoring performa server.
+Repository ini dibuat untuk kebutuhan penelitian/skripsi mengenai perbandingan performa backend REST API berbasis Express.js dan Fastify. Sistem yang diuji mensimulasikan alur e-commerce sederhana, seperti autentikasi user, browsing produk, aktivitas create cart, checkout, dan monitoring performa server.
 
 Project terdiri dari dua versi utama:
 
@@ -45,37 +46,32 @@ Monitoring dilakukan dengan Prometheus dan Grafana, sedangkan load testing dilak
 
 ---
 
-## 🧱 Arsitektur Singkat
+## 🧱 Arsitektur Infrastruktur AWS
 
 ```text
-┌────────────────────┐
-│      k6 Tests      │
-│  load-test-script  │
-└─────────┬──────────┘
-          │ HTTP request
-          ▼
-┌────────────────────┐       ┌────────────────────┐
-│    Express API     │       │    Fastify API     │
-│  Baseline / Opti   │       │  Baseline / Opti   │
-└─────────┬──────────┘       └─────────┬──────────┘
-          │                            │
-          ├──────────────┬─────────────┤
-          ▼              ▼             ▼
-┌────────────────┐ ┌──────────────┐ ┌────────────────┐
-│  PostgreSQL    │ │    Redis     │ │ Queue Workers  │
-│  Database      │ │ BullMQ Queue │ │ Checkout/Stock │
-└────────────────┘ └──────────────┘ └────────────────┘
-          │
-          ▼
-┌────────────────────┐
-│ Prometheus Metrics │
-└─────────┬──────────┘
-          ▼
-┌────────────────────┐
-│  Grafana Dashboard │
-└────────────────────┘
-```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                                       AWS CLOUD                                        │
+│                                                                                        │
+│  ┌──────────────────────┐    ┌──────────────────────┐    ┌──────────────────────────┐  │
+│  │  Availability Zone   │    │  Availability Zone   │    │    Availability Zone     │  │
+│  │   ap-southeast-1a    │    │   ap-southeast-1b    │    │     ap-southeast-1c      │  │
+│  │                      │    │                      │    │                          │  │
+│  │  ┌────────────────┐  │    │  ┌────────────────┐  │    │  ┌────────────────────┐  │  │
+│  │  │ Public Subnet  │  │    │  │ Public Subnet  │  │    │  │   Public Subnet    │  │  │
+│  │  │                │  │    │  │                │  │    │  │                    │  │  │
+│  │  │  ┌──────────┐  │  │    │  │  ┌──────────┐  │  │    │  │  ┌──────────────┐  │  │  │
+│  │  │  │    k6    │  │  │    │  │  │ REST API │  │  │    │  │  │  Prometheus  │  │  │  │
+│  │  │  │          │  │  │    │  │  │          │  │  │    │  │  │      ↓       │  │  │  │
+│  │  │  │t3.medium │  │  │    │  │  │c5.xlarge │  │  │    │  │  │   Grafana    │  │  │  │
+│  │  │  └────┬─────┘  │  │    │  │  └────▲───┬─┘  │  │    │  │  │  c5a.xlarge  │  │  │  │
+│  │  └───────┼────────┘  │    │  └───────┼───┼────┘  │    │  └──┴──────▲───────┴──┘  │  │
+│  └──────────┼───────────┘    └──────────┼───┼───────┘    └────────────┼─────────────┘  │
+│             │                           │   │                           │              │
+│             └─────── HTTP Request ──────┘   └──── Metrics Scraping ─────┘              │
+│                                                                                        │
+└────────────────────────────────────────────────────────────────────────────────────────┘
 
+```
 ---
 
 ## 📁 Struktur Folder
@@ -486,7 +482,7 @@ HOST=127.0.0.1 PORT=3015 k6 run load-test-script/mass-checkout-test.js
 |---|---|---:|---|
 | `auth-spike-test.js` | Register dan login user | 20 → 40 → 80 req/s | Menguji endpoint autentikasi saat spike |
 | `browsing-test.js` | Get products, detail product, categories | 100 → 300 → 600 req/s | Menguji pembacaan data produk/kategori |
-| `cart-activit-test.js` | Create cart, add item, update item, get cart | 80 → 100 → 120 req/s | Menguji aktivitas keranjang |
+| `cart-activit-test.js` | Create cart, add item, update item, get cart | 80 → 100 → 120 req/s | Menguji aktivitas create cart |
 | `mass-checkout-test.js` | Create cart, add item, checkout | 100 → 300 → 600 req/s | Menguji proses checkout massal |
 
 Threshold default pada script:
@@ -505,71 +501,75 @@ Bagian ini disiapkan sebagai template awal. Isi nilai aktual setelah menjalankan
 
 | Item | Nilai |
 |---|---|
-| Tanggal pengujian | `DD/MM/YYYY` |
-| Lokasi server | `Local / VPS / Cloud Provider` |
-| Spesifikasi CPU | `... core / ... vCPU` |
-| RAM | `... GB` |
-| OS | `...` |
-| Node.js | `v...` |
-| PostgreSQL | `v...` |
-| Redis | `v...` |
-| Durasi tiap skenario | `... menit` |
-| Tool load test | `k6 v...` |
+| Lingkungan Pengujian | `AWS EC2` |
+| Spesifikasi | `4 vCPU` |
+| RAM | `8 GB` |
+| OS | `ubuntu 24.04` |
+| Node.js | `v 24.16` |
+| PostgreSQL | `v 18.6` |
+
 
 ### B. Hasil Express vs Fastify Baseline
 
-| Skenario | Framework | Port | Request Rate | Avg Latency | P95 Latency | P99 Latency | Throughput | Error Rate | Status |
-|---|---|---:|---:|---:|---:|---:|---:|---:|---|
-| Auth Spike | Express | 3000 | `... req/s` | `... ms` | `... ms` | `... ms` | `... req/s` | `... %` | `PASS/FAIL` |
-| Auth Spike | Fastify | 3005 | `... req/s` | `... ms` | `... ms` | `... ms` | `... req/s` | `... %` | `PASS/FAIL` |
-| Browsing Load | Express | 3000 | `... req/s` | `... ms` | `... ms` | `... ms` | `... req/s` | `... %` | `PASS/FAIL` |
-| Browsing Load | Fastify | 3005 | `... req/s` | `... ms` | `... ms` | `... ms` | `... req/s` | `... %` | `PASS/FAIL` |
-| Cart Activity | Express | 3000 | `... req/s` | `... ms` | `... ms` | `... ms` | `... req/s` | `... %` | `PASS/FAIL` |
-| Cart Activity | Fastify | 3005 | `... req/s` | `... ms` | `... ms` | `... ms` | `... req/s` | `... %` | `PASS/FAIL` |
-| Mass Checkout | Express | 3000 | `... req/s` | `... ms` | `... ms` | `... ms` | `... req/s` | `... %` | `PASS/FAIL` |
-| Mass Checkout | Fastify | 3005 | `... req/s` | `... ms` | `... ms` | `... ms` | `... req/s` | `... %` | `PASS/FAIL` |
+| Skenario      | Framework | Port | P95 Latency |    Throughput |
+| ------------- | --------- | ---: | ----------: | ------------: |
+| Auth Spike    | Express   | 3000 |   `2620 ms` |  `7242 req/s` |
+| Auth Spike    | Fastify   | 3005 |   `2740 ms` |  `7236 req/s` |
+| Browsing Load | Express   | 3000 | `0.4205 ms` | `90447 req/s` |
+| Browsing Load | Fastify   | 3005 | `0.4675 ms` | `90447 req/s` |
+| Cart Activity | Express   | 3000 |   `2.14 ms` | `36596 req/s` |
+| Cart Activity | Fastify   | 3005 |   `2.39 ms` | `36596 req/s` |
+| Mass Checkout | Express   | 3000 |  `15.25 ms` | `81819 req/s` |
+| Mass Checkout | Fastify   | 3005 |   `37.5 ms` | `81543 req/s` |
 
 ### C. Hasil Express vs Fastify Optimasi
 
-| Skenario | Framework | Port | Request Rate | Avg Latency | P95 Latency | P99 Latency | Throughput | Error Rate | Status |
-|---|---|---:|---:|---:|---:|---:|---:|---:|---|
-| Auth Spike | Express Opti | 3010 | `... req/s` | `... ms` | `... ms` | `... ms` | `... req/s` | `... %` | `PASS/FAIL` |
-| Auth Spike | Fastify Opti | 3015 | `... req/s` | `... ms` | `... ms` | `... ms` | `... req/s` | `... %` | `PASS/FAIL` |
-| Browsing Load | Express Opti | 3010 | `... req/s` | `... ms` | `... ms` | `... ms` | `... req/s` | `... %` | `PASS/FAIL` |
-| Browsing Load | Fastify Opti | 3015 | `... req/s` | `... ms` | `... ms` | `... ms` | `... req/s` | `... %` | `PASS/FAIL` |
-| Cart Activity | Express Opti | 3010 | `... req/s` | `... ms` | `... ms` | `... ms` | `... req/s` | `... %` | `PASS/FAIL` |
-| Cart Activity | Fastify Opti | 3015 | `... req/s` | `... ms` | `... ms` | `... ms` | `... req/s` | `... %` | `PASS/FAIL` |
-| Mass Checkout | Express Opti | 3010 | `... req/s` | `... ms` | `... ms` | `... ms` | `... req/s` | `... %` | `PASS/FAIL` |
-| Mass Checkout | Fastify Opti | 3015 | `... req/s` | `... ms` | `... ms` | `... ms` | `... req/s` | `... %` | `PASS/FAIL` |
+| Skenario      | Framework        | Port | P95 Latency |    Throughput |
+| ------------- | ---------------- | ---: | ----------: | ------------: |
+| Mass Checkout | Express Optimasi | 3010 |   `5.05 ms` | `86249 req/s` |
+| Mass Checkout | Fastify Optimasi | 3015 |   `5.67 ms` | `84699 req/s` |
 
-### D. Perbandingan Optimasi
+### D. Perbandingan Optimasi dengan Baseline
 
-| Skenario | Framework | Baseline Avg Latency | Optimized Avg Latency | Perubahan Latency | Baseline Error Rate | Optimized Error Rate | Kesimpulan |
-|---|---|---:|---:|---:|---:|---:|---|
-| Auth Spike | Express | `... ms` | `... ms` | `... %` | `... %` | `... %` | `...` |
-| Auth Spike | Fastify | `... ms` | `... ms` | `... %` | `... %` | `... %` | `...` |
-| Browsing Load | Express | `... ms` | `... ms` | `... %` | `... %` | `... %` | `...` |
-| Browsing Load | Fastify | `... ms` | `... ms` | `... %` | `... %` | `... %` | `...` |
-| Cart Activity | Express | `... ms` | `... ms` | `... %` | `... %` | `... %` | `...` |
-| Cart Activity | Fastify | `... ms` | `... ms` | `... %` | `... %` | `... %` | `...` |
-| Mass Checkout | Express | `... ms` | `... ms` | `... %` | `... %` | `... %` | `...` |
-| Mass Checkout | Fastify | `... ms` | `... ms` | `... %` | `... %` | `... %` | `...` |
+| Skenario      | Framework | Baseline P95 | Optimasi P95 | Perubahan P95 |
+| ------------- | --------- | -----------: | ------------: | ------------: |
+| Mass Checkout | Express   |   `15.25 ms` |     `5.05 ms` |  **↓ 66.89%** |
+| Mass Checkout | Fastify   |    `37.5 ms` |     `5.67 ms` |  **↓ 84.88%** |
+
 
 ### E. Catatan Observasi
 
 Tuliskan temuan selama pengujian:
 
 ```text
-1. Pada skenario ..., framework ... menunjukkan latency lebih rendah.
-2. Pada beban ..., error rate mulai meningkat pada service ...
-3. Worker/queue berdampak pada ...
-4. Bottleneck utama terlihat pada ...
-5. Rekomendasi optimasi lanjutan: ...
+1. Pada skenario Auth Spike, Express menunjukkan P95 latency
+   yang lebih rendah dibandingkan Fastify.
+
+2. Pada skenario Browsing Load, Express menunjukkan P95 latency
+   yang lebih rendah dibandingkan Fastify.
+
+3. Pada skenario Cart Activity, Express memiliki P95 latency
+   yang lebih rendah dibandingkan Fastify.
+
+4. Pada skenario Mass Checkout baseline, Express menunjukkan
+   P95 latency yang lebih rendah dibandingkan Fastify.
+
+5. Setelah optimasi menggunakan Redis dan BullMQ, kedua framework
+   mengalami penurunan P95 latency pada skenario Mass Checkout.
+
+6. Express Optimasi memperoleh P95 latency lebih rendah
+   dibandingkan Fastify Optimasi.
+
+7. Throughput Express Optimasi lebih tinggi dibandingkan
+   Fastify Optimasi, yaitu 86249 req/s dan 84699 req/s.
+
+8. Optimasi Redis dan BullMQ memberikan peningkatan performa
+   pada skenario Mass Checkout.
 ```
 
 ---
 
-## 🔎 Query Prometheus yang Berguna
+## 🔎 Query Prometheus
 
 Average latency:
 
@@ -625,34 +625,42 @@ Memory usage node exporter:
 node_memory_MemTotal_bytes * 100
 ```
 
----
-
-## ✅ Checklist Pengujian
-
-- [ ] Database PostgreSQL berjalan
-- [ ] Redis berjalan untuk versi optimasi
-- [ ] Express baseline aktif di port 3000
-- [ ] Fastify baseline aktif di port 3005
-- [ ] Express optimasi aktif di port 3010
-- [ ] Fastify optimasi aktif di port 3015
-- [ ] Endpoint `/metrics` dapat diakses
-- [ ] Prometheus berhasil scrape semua target
-- [ ] Grafana menampilkan dashboard
-- [ ] Script k6 berhasil dijalankan
-- [ ] Hasil pengujian dicatat pada template performa
-
----
 
 ## 🧠 Format Kesimpulan Penelitian
 
 Gunakan format berikut setelah semua data performa terisi:
 
 ```text
-Berdasarkan hasil pengujian menggunakan k6 pada skenario Auth Spike, Browsing Load, Cart Activity, dan Mass Checkout, framework ... menunjukkan performa terbaik pada metrik ... dengan rata-rata latency ... ms dan error rate ...%.
+Berdasarkan hasil pengujian throughput, percentile latency, dan kenaikan RPS
+per interval, dapat disimpulkan bahwa performa Express.js dan Fastify
+menunjukkan karakteristik yang berbeda pada setiap skenario pengujian.
+Pada pengujian throughput, Express.js secara konsisten memperoleh nilai
+total request dan RPS yang sedikit lebih tinggi dibandingkan Fastify,
+terutama pada skenario Mass Checkout dan Mass Checkout setelah optimasi.
+Perbedaan performa tersebut dipengaruhi oleh karakteristik arsitektur
+masing-masing framework.
 
-Pada versi optimasi, penggunaan queue/worker memberikan dampak ... terhadap endpoint checkout/cart karena proses berat dipindahkan ke background worker.
+Hasil metrik juga dipengaruhi oleh spesifikasi lingkungan pengujian.
+Kapasitas CPU, RAM, bandwidth jaringan, serta performa I/O
+pada VPS berpengaruh terhadap kemampuan server dalam menangani
+beban concurrent request. Ketika jumlah request meningkat, penggunaan CPU
+menjadi faktor utama yang memengaruhi throughput dan latency.
+Keterbatasan resource server dapat menyebabkan bottleneck sehingga nilai
+RPS menurun pada interval akhir pengujian meskipun penggunaan resource
+masih tinggi. Dalam hal ini, penambahan spesifikasi server perlu dilakukan
+berdasarkan kebutuhan sistem dan estimasi jumlah concurrent user
+agar performa aplikasi tetap stabil, mampu mempertahankan throughput
+yang tinggi, serta meminimalkan peningkatan latency pada kondisi beban tinggi.
 
-Secara keseluruhan, ... lebih sesuai untuk kebutuhan ... sedangkan ... memiliki keunggulan pada ...
+Penerapan optimasi menggunakan Redis dan BullMQ berhasil
+meningkatkan throughput dan menurunkan latency pada kedua framework.
+Redis membantu mempercepat akses data melalui mekanisme in-memory datastore,
+sedangkan BullMQ memindahkan proses berat ke background worker
+sehingga request utama dapat diproses lebih cepat. Namun, optimasi tersebut
+juga meningkatkan penggunaan resource karena adanya proses queue
+dan worker tambahan. Express.js setelah optimasi menunjukkan performa
+yang lebih tinggi dengan penggunaan resource yang lebih efisien.
+
 ```
 
 ---
