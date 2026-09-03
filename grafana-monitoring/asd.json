@@ -1,0 +1,51 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "name": "Annotations & Alerts",
+        "type": "dashboard",
+        "enable": true
+      }
+    ]
+  },
+  "panels": [
+    {
+      "title": "RPS (Requests Per Second)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum by (job) (rate(http_request_duration_seconds_count[10s]))"
+        }
+      ]
+    },
+    {
+      "title": "Average Latency",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "(sum(rate(http_request_duration_seconds_sum[10s])) / sum(rate(http_request_duration_seconds_count[10s]))) * 1000"
+        }
+      ]
+    },
+    {
+      "title": "CPU Usage (%)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "100 - (avg(rate(node_cpu_seconds_total{mode=\"idle\"}[10s])) * 100)"
+        }
+      ]
+    },
+    {
+      "title": "RAM Usage (%)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100"
+        }
+      ]
+    }
+  ],
+  "refresh": "1m",
+  "schemaVersion": 32
+}
